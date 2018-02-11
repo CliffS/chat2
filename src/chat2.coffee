@@ -42,7 +42,7 @@ class Chat2
         delete @client
       .on 'readable', =>
         data = @client.read()
-        lines = data.split CRLF
+        lines = data.split CRLF         # lines may have a "" as the last element
         @client.unshift lines.pop()     # push back any partial line
         @queue = @queue.concat lines    # doesn't matter if we concat an empty array
         @client.read 0      # trigger the next event, in case
