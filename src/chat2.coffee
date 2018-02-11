@@ -65,13 +65,17 @@ class Chat2
   send: (string) ->
     new Promise (resolve, reject) =>
       return reject new Error 'No socket' unless @client?
-      socket.write string + CRLF
+      @client.write string + CRLF
       resolve string
 
   exec: (string, pattern) ->
     @send string
     .then =>
-      expect pattern
+      @expect pattern
+
+  close: ->
+    @client.end()
+    delete @client
 
 module.exports = Chat2
 
