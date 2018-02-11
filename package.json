@@ -1,0 +1,34 @@
+{
+  "name": "chat2",
+  "version": "0.1.0",
+  "description": "A simple telnet app to chat to a server with send and expect",
+  "main": "lib/chat2.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "coffee -o lib -c -w src &",
+    "build": "coffee -o lib -c -w src",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CliffS/chat2.git"
+  },
+  "keywords": [
+    "chat",
+    "telnet",
+    "teletype"
+  ],
+  "author": "Cliff Stanforc <cliff@may.be>",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/CliffS/chat2/issues"
+  },
+  "homepage": "https://github.com/CliffS/chat2#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "coffeescript": "^2.2.1"
+  }
+}
