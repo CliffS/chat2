@@ -1,6 +1,6 @@
 {
   "name": "chat2",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple telnet app to chat to a server with send and expect",
   "main": "lib/chat2.js",
   "directories": {
