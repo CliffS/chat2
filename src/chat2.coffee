@@ -10,13 +10,13 @@ eTimedOut = (msg) ->
 
 class Chat2
 
-  contructor: (@host, @port, @timeout) ->
+  constructor: (@host, @port, @timeout) ->
     @port = 23 unless @port?
     throw new TypeError 'host must be a string' unless typeof @host is 'string'
     throw new TypeError 'port must be a number' unless typeof @port is 'number'
     if @timeout?
       throw new TypeError 'timeout (if defined) must be greater than zero' unless @timeout > 0
-    @emitter = new EventEmitter
+    @emitter = new EventEmitter()
 
   queue: []
   pending: ''
@@ -31,6 +31,7 @@ class Chat2
       @client = net.createConnection
         host: @host
         port: @port
+      .setEncoding 'utf-8'
       .once 'connect', =>
         clearTimeout timer if timer
         resolve @client.setKeepAlive true
@@ -40,21 +41,21 @@ class Chat2
       .once 'end', =>
         delete @client
       .on 'data', (data) =>
-        data = pending + data
+        data = @pending + data
         lines = data.split CRLF
-        @pending = lines.pop
-        queue = array.concat queue, lines
-        @emitter.emit 'newline' if lines.length
+        @pending = lines.pop()        # if it ends with a CRLF, @pending will be ""
+        @queue = @queue.concat lines    # doesn't matter if we concat an empty array
+        @emitter.emit 'newline', lines if lines.length # but only emit if we added a line
 
   expect: (pattern) ->
     new Promise (resolve, reject) =>
       return reject new Error 'No socket' unless @client?
       timer = setTimeout =>
-        reject eTimeOut 'Expect timed out'
+        reject eTimedOut 'Expect timed out'
       , @timeout if @timeout
       getLine = =>
-        while queue.length > 0
-          line = queue.shift()
+        while @queue.length > 0
+          line = @queue.shift()
           if line.match pattern
             clearTimeout timer if timer
             @emitter.removeListener 'newline', getLine
@@ -69,6 +70,7 @@ class Chat2
       resolve string
 
   exec: (string, pattern) ->
+    return Promise.reject new Error 'string and pattern required' unless string? and pattern?
     @send string
     .then =>
       @expect pattern
