@@ -17,9 +17,9 @@ class Chat2
     if @timeout?
       throw new TypeError 'timeout (if defined) must be greater than zero' unless @timeout > 0
     @emitter = new EventEmitter()
+    .setMaxListeners Infinity
 
   queue: []
-  pending: ''
 
   connect: ->
     new Promise (resolve, reject) =>
@@ -40,11 +40,12 @@ class Chat2
         reject err
       .once 'end', =>
         delete @client
-      .on 'data', (data) =>
-        data = @pending + data
+      .on 'readable', =>
+        data = @client.read()
         lines = data.split CRLF
-        @pending = lines.pop()        # if it ends with a CRLF, @pending will be ""
+        @client.unshift lines.pop()     # push back any partial line
         @queue = @queue.concat lines    # doesn't matter if we concat an empty array
+        @client.read 0      # trigger the next event, in case
         @emitter.emit 'newline', lines if lines.length # but only emit if we added a line
 
   expect: (pattern) ->
@@ -59,9 +60,11 @@ class Chat2
           if line.match pattern
             clearTimeout timer if timer
             @emitter.removeListener 'newline', getLine
-            return resolve line
-      getLine()     # Try it once and, if it fails, keep trying
-      @emitter.on 'newline', getLine
+            resolve line
+            return true         # Return true if you've resolved
+                                # being careful to leave the rest of the queue
+      unless getLine()     # Try it once and, if it fails, wait for the event
+        @emitter.on 'newline', getLine
 
   send: (string) ->
     new Promise (resolve, reject) =>
@@ -77,6 +80,7 @@ class Chat2
 
   close: ->
     @client.end()
+    @client.removeAllListeners 'readable'
     delete @client
 
 module.exports = Chat2
