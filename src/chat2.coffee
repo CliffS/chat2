@@ -46,7 +46,7 @@ class Chat2
           lines = data.split CRLF         # lines may have a "" as the last element
           popped = lines.pop()            # null unless partial line
           @client.unshift popped if popped     # push back any partial line
-          @client.read 0      # trigger the next event, in case
+          # @client.read 0      # trigger the next event, in case
           if lines.length
             @queue = @queue.concat lines    # add any lines to the queue
             @emitter.emit 'newline', lines  # and emit for the next waiting expect
