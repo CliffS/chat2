@@ -42,11 +42,14 @@ class Chat2
         delete @client
       .on 'readable', =>
         data = @client.read()
-        lines = data.split CRLF         # lines may have a "" as the last element
-        @client.unshift lines.pop()     # push back any partial line
-        @queue = @queue.concat lines    # doesn't matter if we concat an empty array
-        @client.read 0      # trigger the next event, in case
-        @emitter.emit 'newline', lines if lines.length # but only emit if we added a line
+        if data
+          lines = data.split CRLF         # lines may have a "" as the last element
+          popped = lines.pop()            # null unless partial line
+          @client.unshift popped if popped     # push back any partial line
+          @client.read 0      # trigger the next event, in case
+          if lines.length
+            @queue = @queue.concat lines    # add any lines to the queue
+            @emitter.emit 'newline', lines  # and emit for the next waiting expect
 
   expect: (pattern) ->
     new Promise (resolve, reject) =>
