@@ -27,9 +27,7 @@
     "url": "https://github.com/CliffS/chat2/issues"
   },
   "homepage": "https://github.com/CliffS/chat2#readme",
-  "dependencies": {
-    "locks": "^0.2.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "coffeescript": "^2.2.1"
   }

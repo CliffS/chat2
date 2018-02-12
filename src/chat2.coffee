@@ -1,6 +1,5 @@
 net = require 'net'
 EventEmitter = require 'events'
-Locks = require 'locks'
 
 CRLF = "\r\n"
 
@@ -19,9 +18,9 @@ class Chat2
       throw new TypeError 'timeout (if defined) must be greater than zero' unless @timeout > 0
     @emitter = new EventEmitter()
     .setMaxListeners Infinity
-    @mutex = Locks.createMutex()
 
   queue: []
+  pending: ''
 
   connect: ->
     new Promise (resolve, reject) =>
@@ -42,18 +41,13 @@ class Chat2
         reject err
       .once 'end', =>
         delete @client
-      .on 'readable', =>
-        @mutex.lock =>
-          data = @client.read()
-          if data
-            lines = data.split CRLF         # lines may have a "" as the last element
-            popped = lines.pop()            # null unless partial line
-            @client.unshift popped if popped     # push back any partial line
-            # @client.read 0      # trigger the next event, in case
-            if lines.length
-              @queue = @queue.concat lines    # add any lines to the queue
-              @emitter.emit 'newline', lines  # and emit for the next waiting expect
-          @mutex.unlock()
+      .on 'data', (data) =>
+        data = @pending + data
+        lines = data.split CRLF         # lines may have a "" as the last element
+        @pending = lines.pop()            # null unless partial line
+        if lines.length
+          @queue = @queue.concat lines    # add any lines to the queue
+          @emitter.emit 'newline', lines  # and emit for the next waiting expect
 
   expect: (pattern) ->
     new Promise (resolve, reject) =>
@@ -86,9 +80,9 @@ class Chat2
       @expect pattern
 
   close: ->
-    @client.end()
-    @client.removeAllListeners 'readable'
-    delete @client
+    @client?.end()
+    @client?.removeAllListeners 'readable'
+    # client will be deleted by the 'end' event
 
 module.exports = Chat2
 
