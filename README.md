@@ -1,6 +1,14 @@
 # chat2
 
-A simple telnet app to chat to a server with send and expect
+A simple telnet app to chat with a server.  It uses
+`send` and `expect` to chat and wait for an expected response.
+There is also an `exec` method to send and expect in sequence.
+
+This module allows you to chat programatically to any server such as
+a POP3 server or an SMTP server that uses a known protocol
+that can be sent to and expected.  It uses native Promises
+and is pipeline safe: you can send and expect from multiple async 
+calls and the data will arrive back in the right order.
 
 ## Install
 
@@ -106,6 +114,18 @@ chat2.close()
 
 This will close the connection cleanly and leave the chat2 instance
 ready to be reconnected, if desired.
+
+## History
+
+This program is called chat2 as it was inspired by
+Randal L. Schwartz' Perl 4 program [chat2.pl](http://chat2.pl)
+from 1991.
+
+## Similar programs
+
+The [teletype](https://www.npmjs.com/package/teletype) module
+is similar but will lose data if it comes in too fast.
+
 
 ## Issues
 
