@@ -51,7 +51,7 @@ class Chat2
 
   expect: (pattern) ->
     new Promise (resolve, reject) =>
-      return reject new Error 'No socket' unless @client?
+      return reject new Error 'Expect error: No socket' unless @client?
       timer = setTimeout =>
         reject eTimedOut 'Expect timed out'
       , @timeout if @timeout
@@ -69,7 +69,7 @@ class Chat2
 
   send: (string) ->
     new Promise (resolve, reject) =>
-      return reject new Error 'No socket' unless @client?
+      return reject new Error 'Send error: No socket' unless @client?
       @client.write string + CRLF
       resolve string
 
