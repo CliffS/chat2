@@ -81,7 +81,7 @@ class Chat2
 
   close: ->
     @client?.end()
-    @client?.removeAllListeners 'readable'
+    @emitter?.removeAllListeners()
     # client will be deleted by the 'end' event
 
 module.exports = Chat2
