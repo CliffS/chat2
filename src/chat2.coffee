@@ -53,7 +53,7 @@ class Chat2
     new Promise (resolve, reject) =>
       return reject new Error 'Expect error: No socket' unless @client?
       timer = setTimeout =>
-        reject eTimedOut 'Expect timed out'
+        reject eTimedOut "Expect timed out: #{pattern}"
       , @timeout if @timeout
       getLine = =>
         while @queue.length > 0
