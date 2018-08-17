@@ -25,7 +25,7 @@ class Chat2
   connect: ->
     new Promise (resolve, reject) =>
       timer = setTimeout =>
-        reject eTimedOut 'Connection timed out'
+        reject eTimedOut "Connection timed out #{host}:#{port}"
         @client?.destroy()
         delete @client
       , @timeout if @timeout
